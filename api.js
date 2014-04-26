@@ -1,15 +1,28 @@
-// api.js
-var express = require("express");
-var logfmt = require("logfmt");
-var app = express();
+var application_root = __dirname,
+    express = require("express"),
+    path = require("path"),
+    mongoose = require('mongoose');
 
-app.use(logfmt.requestLogger());
+var app = express.createServer();
 
-app.get('/', function(req, res) {
-  res.send('Hello World!');
+// Database
+
+mongoose.connect('mongodb://localhost/swaeng_database');
+
+// Config
+
+app.configure(function () {
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(path.join(application_root, "public")));
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
-var port = Number(process.env.PORT || 5000);
-app.listen(port, function() {
-  console.log("Listening on " + port);
+app.get('/api', function (req, res) {
+  res.send('Ecomm API is running');
 });
+
+// Launch server
+
+app.listen(4242);
